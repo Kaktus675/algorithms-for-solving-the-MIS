@@ -71,24 +71,47 @@ namespace Class1
         // алгоритм A2 
         public static List<int> FindMaxSetA2(Dictionary<int, List<int>> neighbors)
         {
-            var neighborsCopy = new Dictionary<int, List<int>>(neighbors);
-            var sortedVer = neighbors.Keys.OrderBy(v => neighbors[v].Count).ToList();
+            Dictionary<int, List<int>> neighborsCopy = new Dictionary<int, List<int>>(neighbors);
             List<int> maxSet = new List<int>();
 
-            foreach (int i in sortedVer)
+            while (neighborsCopy.Count > 0)
             {
-                if (!neighborsCopy.ContainsKey(i))
-                    continue;
-
-                maxSet.Add(i);
-                var neighborsToRemove = neighborsCopy[i].ToList();
-                neighborsCopy.Remove(i);
-                foreach (int neighbor in neighborsToRemove)
+                int minVer = MinVer(neighborsCopy);
+                maxSet.Add(minVer);
+                List<int> minVerNeighbors = new List<int>(neighborsCopy[minVer]);
+                foreach (int i in minVerNeighbors)
                 {
-                    neighborsCopy.Remove(neighbor);
+                    if (!neighborsCopy.ContainsKey(i))
+                        continue;
+
+                    foreach (int j in neighborsCopy[i])
+                    {
+                        if (neighborsCopy.ContainsKey(j))
+                        {
+                            neighborsCopy[j].Remove(i);
+
+                        }
+                    }
+                    neighborsCopy.Remove(i);
                 }
+                neighborsCopy.Remove(minVer);
+
             }
             return maxSet;
+        }
+        public static int MinVer(Dictionary<int, List<int>> dict)
+        {
+            int minKey = dict.Keys.First();
+            int minLen = dict[minKey].Count;
+            foreach(var i in dict)
+            {
+                if (minLen > i.Value.Count)
+                {
+                    minLen = i.Value.Count;
+                    minKey = i.Key;
+                }
+            }
+            return minKey;
         }
     }
 }
