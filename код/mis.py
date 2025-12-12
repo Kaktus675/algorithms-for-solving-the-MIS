@@ -33,21 +33,17 @@ def find_max_set_a1_py(graph,neighbors,cur_set):
     result2 = find_max_set_a1_py(new_graph,neighbors,cur_set)
     return max([result1, result2], key=len)
 
-# поиск максимально независимого множество эвристическим алгоритмом
+# поиск максимально независимого множество жадным алгоритмомом
 def find_max_set_a2_py(neighbors):
     neighbors_copy = neighbors.copy()
     max_set = []
-    sorted_ver = sorted(neighbors_copy.keys(), key=lambda x: len(neighbors_copy[x]))
     while neighbors_copy:
-        if len(sorted_ver)==0:
-            break
-        var = sorted_ver.pop(0)
-        if (var not in neighbors_copy):
-            continue
-        neighbor = neighbors_copy[var]
+        var = min(neighbors_copy.keys(), key=lambda x: len(neighbors_copy[x]))
+        neighbors_list = neighbors_copy[var].copy()
         max_set.append(var)
-        for i in neighbor:
-            neighbors_copy.pop(i, None)
+        for i in neighbors_list:
+            if i in neighbors_copy:
+                neighbors_copy.pop(i, None)
         neighbors_copy.pop(var,None)
     return max_set
 
@@ -79,7 +75,7 @@ def visual(graph_dict, set1, set2):
     plt.legend(handles=[
         Patch(facecolor='purple', label='В обоих алгоритмах'),
         Patch(facecolor='red', label='точный рекурсивный алгоритм'),
-        Patch(facecolor='blue', label='эвристический алгоритм'),
+        Patch(facecolor='blue', label='жадный алгоритм'),
         Patch(facecolor='lightgray', label='нигде')
     ], loc='best')
     plt.title("граф", fontsize=16)
