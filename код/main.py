@@ -13,14 +13,19 @@ if t:
     st = int(input("шаг: "))
     if sav:
         result = tests(n, g, st)
+        with open('results.pkl', 'wb') as f:
+            pickle.dump(result, f)
     else:
         with open('results.pkl', 'rb') as f:
             result = pickle.load(f)
-    tests_visual(result)
-    visual_func_family(result[0],result[1],result[2],st)
+    pol = tests_polinom(result)
+    tests_visual(result,pol[0],pol[1],st)
+    visual_func_family(result,pol[0],pol[1],st)
 else:
     if sav:
         result = test(n, g)
+        with open('results.pkl', 'wb') as f:
+            pickle.dump(result, f)
     else:
         with open('results.pkl', 'rb') as f:
             result = pickle.load(f)

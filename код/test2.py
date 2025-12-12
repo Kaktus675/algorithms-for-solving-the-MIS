@@ -37,7 +37,7 @@ def find_max_set_a2_cs(neighbors):
     return list(Solver.FindMaxSetA2_Simple(neighbor_keys, neighbor_arrays))
 # тесты для графов с n вершинами
 def test(max_ver,number_of_test_graphs):
-    densities = [i * 0.005 for i in range(30,201)]
+    densities = [i * 0.005 for i in range(201)]
     results = {
         'плотность': [],
         'время точного': [],
@@ -86,22 +86,27 @@ def test(max_ver,number_of_test_graphs):
 #множественные тесты для графов от step до n с шагом step и полином 3 степени
 def tests(max_ver,number_of_test_graphs,step):
     tests_results = []
-    x_fit = []
-    y_fit = []
     for i in range(step,max_ver+1,step):
         k = test(i,number_of_test_graphs)
-        pol = test_polinom(k)
-        x_fit.append(pol[0])
-        y_fit.append(pol[1])
         tests_results.append(k)
-    return tests_results,x_fit,y_fit,step
+    return tests_results
 # полином 3 степени (для функции test )
 def test_polinom(test_results):
     x_fit = np.linspace(min(test_results["плотность"]), max(test_results["плотность"]), 100)
     A = np.vander(test_results["плотность"], 4)
     coefficients, residuals, rank, s = linalg.lstsq(A, test_results["точность"])
     y_fit = coefficients[0] * x_fit ** 3 + coefficients[1] * x_fit ** 2 + coefficients[2] * x_fit + coefficients[3]
+    y_fit = np.clip(y_fit, 0, 100)
     return x_fit,y_fit
+
+def tests_polinom(tests_results):
+    x_fit = []
+    y_fit = []
+    for i in tests_results:
+        pol = test_polinom(i)
+        x_fit.append(pol[0])
+        y_fit.append(pol[1])
+    return x_fit, y_fit
 # визуализация тестов
 def test_visual(results,x_fit,y_fit):
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
@@ -150,10 +155,9 @@ def test_visual(results,x_fit,y_fit):
     plt.tight_layout()
     plt.show()
 
-def tests_visual(results):
+def tests_visual(results,pol_x,pol_y,step):
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
     plt.subplots_adjust(bottom=0.15)
-    step = results[3]
     ax_slider = plt.axes([0.25, 0.02, 0.5, 0.03])
     slider = Slider(ax_slider, 'Количество вершин', step, len(results[0])*step, valinit=step, valstep=step)
     def update(val):
@@ -163,15 +167,15 @@ def tests_visual(results):
         n_ver = int(slider.val)//step - 1
 
         # Данные для текущего количества вершин
-        density = results[0][n_ver]['плотность']
-        exact_time = results[0][n_ver]['время точного']
-        greedy_time = results[0][n_ver]['время жадного']
-        accuracy = results[0][n_ver]['точность']
-        exact_size = results[0][n_ver]['размер точного']
-        greedy_size = results[0][n_ver]['размер жадного']
-        speed_ratio = results[0][n_ver]['отношение скоростей']
-        x_fit = results[1][n_ver]
-        y_fit = results[2][n_ver]
+        density = results[n_ver]['плотность']
+        exact_time = results[n_ver]['время точного']
+        greedy_time = results[n_ver]['время жадного']
+        accuracy = results[n_ver]['точность']
+        exact_size = results[n_ver]['размер точного']
+        greedy_size = results[n_ver]['размер жадного']
+        speed_ratio = results[n_ver]['отношение скоростей']
+        x_fit = pol_x[n_ver]
+        y_fit = pol_y[n_ver]
 
         # Метрики точности полинома
         y_poly_at_density = np.interp(density, x_fit, y_fit)
@@ -235,13 +239,13 @@ def visual_func_family(results,x_fit,y_fit,step):
     # 2. Размер множества - точный алгоритм
     plt.figure(figsize=(12, 8))
     for i in range(len(results)):
-        plt.plot(results[i]['плотность'], results[i]["размер точного"],
-                 color=colors[i], label=n_values[i], linewidth=2)
+        plt.plot(results[i]['плотность'], results[i]["размер точного"],color=colors[i], label=n_values[i], linewidth=2)
     plt.xlabel('Плотность графа')
     plt.ylabel('Размер множества')
     plt.title('Изменение среднего размера множества (точный алгоритм) для разных n')
     plt.legend()
     plt.grid(True, alpha=0.3)
+    plt.xlim(0,1)
     plt.show()
 
     # 3. Размер множества - жадный алгоритм
@@ -249,7 +253,7 @@ def visual_func_family(results,x_fit,y_fit,step):
     for i in range(len(results)):
         plt.plot(results[i]['плотность'], results[i]["размер жадного"],color=colors[i], label=n_values[i], linewidth=2)
     plt.xlabel('Плотность графа')
-    plt.ylabel('Размер множества')
+    plt.ylabel('Размер независимого множества')
     plt.title('Изменение среднего размера множества (жадный алгоритм) для разных n')
     plt.legend()
     plt.grid(True, alpha=0.3)
@@ -293,4 +297,5 @@ def visual_func_family(results,x_fit,y_fit,step):
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.show()
+
 
