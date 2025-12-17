@@ -2,11 +2,6 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 import networkx as nx
-
-n = int(input("количество вершин: "))
-h = float(input("связность от 0 до 1, 0 - не связный, 1 - сильносвязный: "))
-graph_ver = [i for i in range(1, n + 1)]
-
 #генерация рандомного графа с n вершинами
 def generate_random_graph(n_ver, edge_probability):
     graph = {i: [] for i in range(1, n_ver + 1)}
@@ -16,7 +11,6 @@ def generate_random_graph(n_ver, edge_probability):
                 graph[i].append(j)
                 graph[j].append(i)
     return graph
-graph_neighbors = generate_random_graph(n,h)
 
 # поиск максимального независимого множества точным алгоритмом
 def find_max_set_a1_py(graph,neighbors,cur_set):
@@ -46,9 +40,6 @@ def find_max_set_a2_py(neighbors):
                 neighbors_copy.pop(i, None)
         neighbors_copy.pop(var,None)
     return max_set
-
-result_a1 = find_max_set_a1_py(graph_ver, graph_neighbors,[])
-result_a2 = find_max_set_a2_py(graph_neighbors)
 
 #визуализация
 def visual(graph_dict, set1, set2):
@@ -82,8 +73,3 @@ def visual(graph_dict, set1, set2):
     plt.axis('off')
     plt.tight_layout()
     plt.show()
-
-print(graph_neighbors)
-print(result_a1)
-print(result_a2)
-visual(graph_neighbors,result_a1,result_a2)

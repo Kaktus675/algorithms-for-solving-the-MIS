@@ -37,7 +37,7 @@ def find_max_set_a2_cs(neighbors):
     return list(Solver.FindMaxSetA2_Simple(neighbor_keys, neighbor_arrays))
 # тесты для графов с n вершинами
 def test(max_ver,number_of_test_graphs):
-    densities = [i * 0.005 for i in range(201)]
+    densities = [i * 0.005 for i in range(30,201)]
     results = {
         'плотность': [],
         'время точного': [],
@@ -159,7 +159,7 @@ def tests_visual(results,pol_x,pol_y,step):
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
     plt.subplots_adjust(bottom=0.15)
     ax_slider = plt.axes([0.25, 0.02, 0.5, 0.03])
-    slider = Slider(ax_slider, 'Количество вершин', step, len(results[0])*step, valinit=step, valstep=step)
+    slider = Slider(ax_slider, 'Количество вершин', step, len(results)*step, valinit=step, valstep=step)
     def update(val):
         for ax in [ax1, ax2, ax3, ax4]:
             ax.clear()
